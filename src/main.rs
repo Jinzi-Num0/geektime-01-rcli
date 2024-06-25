@@ -17,6 +17,10 @@ fn main() -> anyhow::Result<()> {
         SubCommand::Genpass(opts) => {
             process_genpass(&opts)?;
         }
+
+        SubCommand::Base64(opts) => {
+            println!("{:?}", opts);
+        }
     }
     Ok(())
 }
