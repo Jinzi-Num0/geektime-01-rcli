@@ -3,4 +3,4 @@ mod process;
 
 pub use opts::{Opts, SubCommand};
 
-pub use process::{process_csv, Record};
+pub use {process::process_csv, process::process_genpass};
