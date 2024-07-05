@@ -9,7 +9,7 @@ pub struct GenPassOpts {
     pub uppercase: bool,
 
     #[arg(long, default_value_t = true)]
-    pub lowecase: bool,
+    pub lowercase: bool,
 
     #[arg(long, default_value_t = true)]
     pub number: bool,
