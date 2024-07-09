@@ -2,8 +2,9 @@ use std::fs;
 
 use clap::Parser;
 use rcli::{
-    process_csv, process_decode, process_encode, process_generate_key, process_genpass,
-    process_sign, process_verify, Base64SubCommand, Opts, SubCommand, TextSubCommand,
+    process_csv, process_decode, process_decrypt, process_encode, process_encrypt,
+    process_generate_key, process_genpass, process_sign, process_verify, Base64SubCommand, Opts,
+    SubCommand, TextSubCommand,
 };
 
 fn main() -> anyhow::Result<()> {
@@ -63,6 +64,14 @@ fn main() -> anyhow::Result<()> {
                         fs::write(name.join("ed25519.pk"), &key[1])?;
                     }
                 }
+            }
+            TextSubCommand::Encrypt(opts) => {
+                let encrypted = process_encrypt(&opts.input, &opts.key)?;
+                println!("{}", encrypted);
+            }
+            TextSubCommand::Decrypt(opts) => {
+                let decrypted = process_decrypt(&opts.input, &opts.key)?;
+                println!("{}", decrypted);
             }
         },
     }

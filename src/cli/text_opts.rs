@@ -10,6 +10,26 @@ pub enum TextSubCommand {
     Verify(TextVerifyOpts),
     #[command(name = "generate-key", about = "Generate a key")]
     GenerateKey(TextGenerateKeyOpts),
+    #[command(name = "encrypt", about = "Encrypt a text")]
+    Encrypt(TextEncryptOpts),
+    #[command(name = "decrypt", about = "Decrypt a text")]
+    Decrypt(TextDecryptOpts),
+}
+
+#[derive(Debug, Parser)]
+pub struct TextDecryptOpts {
+    #[arg(short, long, value_parser = verify_file,default_value="-")]
+    pub input: String,
+    #[arg(short, long)]
+    pub key: String,
+}
+
+#[derive(Debug, Parser)]
+pub struct TextEncryptOpts {
+    #[arg(short, long, value_parser = verify_file,default_value="-")]
+    pub input: String,
+    #[arg(short, long)]
+    pub key: String,
 }
 
 #[derive(Debug, Parser)]
