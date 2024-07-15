@@ -27,12 +27,32 @@ pub enum SubCommand {
     Csv(CsvOpts),
     #[command(name = "genpass", about = "Generate a random password")]
     Genpass(GenPassOpts),
-    #[command(subcommand)]
+    #[command(subcommand, about = "Base64 encode or decode")]
     Base64(Base64SubCommand),
-    #[command(subcommand)]
+    #[command(
+        subcommand,
+        about = "Text sign, verify, encrypt, decrypt, or generate key"
+    )]
     Text(TextSubCommand),
-    #[command(subcommand)]
+    #[command(subcommand, about = "HTTP server")]
     Http(HttpSubCommand),
+}
+
+#[allow(async_fn_in_trait)]
+pub trait CmdExcuter {
+    async fn execute(self) -> anyhow::Result<()>;
+}
+
+impl CmdExcuter for SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            SubCommand::Genpass(opts) => opts.execute().await,
+            SubCommand::Base64(subcmd) => subcmd.execute().await,
+            SubCommand::Csv(opts) => opts.execute().await,
+            SubCommand::Http(subcmd) => subcmd.execute().await,
+            SubCommand::Text(subcmd) => subcmd.execute().await,
+        }
+    }
 }
 
 pub fn verify_file(filename: &str) -> Result<String, String> {

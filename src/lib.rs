@@ -1,7 +1,9 @@
 mod cli;
 mod process;
 mod utils;
-pub use cli::{Base64SubCommand, HttpSubCommand, Opts, SubCommand, TextSignFormat, TextSubCommand};
+pub use cli::{
+    Base64SubCommand, CmdExcuter, HttpSubCommand, Opts, SubCommand, TextSignFormat, TextSubCommand,
+};
 pub use utils::get_reader;
 pub use {
     process::process_csv, process::process_decode, process::process_decrypt,
