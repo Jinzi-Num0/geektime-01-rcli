@@ -2,9 +2,11 @@ use crate::{process_decrypt, process_encrypt, process_generate_key, process_sign
 
 use super::{verify_file, verify_file_path, CmdExcuter};
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 use std::{fmt, path::PathBuf, str::FromStr};
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExcuter)]
 pub enum TextSubCommand {
     #[command(name = "sign", about = "Sign a text")]
     Sign(TextSignOpts),
@@ -65,18 +67,6 @@ impl CmdExcuter for TextDecryptOpts {
         let decrypted = process_decrypt(&self.input, &self.key)?;
         println!("{}", decrypted);
         Ok(())
-    }
-}
-
-impl CmdExcuter for TextSubCommand {
-    async fn execute(self) -> anyhow::Result<()> {
-        match self {
-            TextSubCommand::Sign(opt) => opt.execute().await,
-            TextSubCommand::Verify(opt) => opt.execute().await,
-            TextSubCommand::GenerateKey(opt) => opt.execute().await,
-            TextSubCommand::Encrypt(opt) => opt.execute().await,
-            TextSubCommand::Decrypt(opt) => opt.execute().await,
-        }
     }
 }
 

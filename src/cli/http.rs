@@ -1,23 +1,17 @@
 use std::path::PathBuf;
 
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 
 use crate::process_http_serve;
 
 use super::CmdExcuter;
 
+#[enum_dispatch(CmdExcuter)]
 #[derive(Debug, Parser)]
 pub enum HttpSubCommand {
     #[command(name = "serve", about = "Start a HTTP server")]
     Server(HttpsServerOpts),
-}
-
-impl CmdExcuter for HttpSubCommand {
-    async fn execute(self) -> anyhow::Result<()> {
-        match self {
-            HttpSubCommand::Server(opt) => opt.execute().await,
-        }
-    }
 }
 
 impl CmdExcuter for HttpsServerOpts {
