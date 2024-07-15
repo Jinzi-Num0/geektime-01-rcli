@@ -3,14 +3,23 @@ use std::fs;
 use clap::Parser;
 use rcli::{
     process_csv, process_decode, process_decrypt, process_encode, process_encrypt,
-    process_generate_key, process_genpass, process_sign, process_verify, Base64SubCommand, Opts,
-    SubCommand, TextSubCommand,
+    process_generate_key, process_genpass, process_http_serve, process_sign, process_verify,
+    Base64SubCommand, HttpSubCommand, Opts, SubCommand, TextSubCommand,
 };
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt::init();
     let opts = Opts::parse();
     println!("{:?}", opts);
     match opts.cmd {
+        SubCommand::Http(subcmd) => match subcmd {
+            HttpSubCommand::Server(opts) => {
+                let response = process_http_serve(opts.dir, opts.port);
+                println!("{:?}", response.await?)
+            }
+        },
+
         SubCommand::Csv(opts) => {
             let output = if let Some(output) = opts.output {
                 output.clone()

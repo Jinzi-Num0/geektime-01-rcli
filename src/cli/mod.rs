@@ -1,6 +1,7 @@
 mod base64_opts;
 mod csv_opts;
 mod genpass_opts;
+mod http;
 mod text_opts;
 
 use clap::Parser;
@@ -9,6 +10,7 @@ use std::path::{Path, PathBuf};
 pub use base64_opts::{Base64Format, Base64SubCommand};
 pub use csv_opts::{CsvOpts, OutputFormat};
 pub use genpass_opts::GenPassOpts;
+pub use http::HttpSubCommand;
 pub use text_opts::{TextSignFormat, TextSubCommand};
 
 //rcli csv -i input.csv -o output.json --herder -d ','
@@ -29,6 +31,8 @@ pub enum SubCommand {
     Base64(Base64SubCommand),
     #[command(subcommand)]
     Text(TextSubCommand),
+    #[command(subcommand)]
+    Http(HttpSubCommand),
 }
 
 pub fn verify_file(filename: &str) -> Result<String, String> {
