@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+use std::{fs, net::SocketAddr, path::PathBuf, sync::Arc};
 
 use anyhow::Result;
 use axum::{
@@ -18,15 +18,6 @@ pub async fn process_http_serve(dir: PathBuf, port: u16) -> Result<()> {
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!("Starting dir:{:?} at {}...", dir, addr);
     let state = HttpServeState { path: dir.clone() };
-
-    // let dir_service = ServeDir::new(dir)
-    //     .append_index_html_on_directories(true)
-    //     .precompressed_br()
-    //     .precompressed_deflate()
-    //     .precompressed_gzip()
-    //     .precompressed_zstd();
-
-    // axum router
     let router = axum::Router::new()
         .nest_service("/tower", ServeDir::new(dir))
         .route("/*path", get(file_handler))
@@ -43,22 +34,33 @@ async fn file_handler(
 ) -> (StatusCode, String) {
     let p = std::path::Path::new(&state.path).join(path);
     if p.exists() {
-        match tokio::fs::read(p).await {
-            Ok(content) => {
-                let content = String::from_utf8_lossy(&content);
-                info!("read file length: {}", content.len());
-                (StatusCode::OK, content.to_string())
+        if p.is_dir() {
+            let mut content = String::new();
+            for entry in fs::read_dir(p).unwrap() {
+                let entry = entry.unwrap();
+                let path = entry.path();
+                let name = entry.file_name();
+                content.push_str(&format!(
+                    "path:{},name:{}/\n",
+                    path.display(),
+                    name.to_string_lossy()
+                ));
             }
-            Err(e) => {
-                warn!("Error reading file e: {}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, format!("Error: {}", e))
+            (StatusCode::OK, content)
+        } else {
+            match tokio::fs::read(p).await {
+                Ok(content) => {
+                    let content = String::from_utf8_lossy(&content);
+                    info!("read file length: {}", content.len());
+                    (StatusCode::OK, content.to_string())
+                }
+                Err(e) => {
+                    warn!("Error reading file e: {}", e);
+                    (StatusCode::INTERNAL_SERVER_ERROR, format!("Error: {}", e))
+                }
             }
         }
     } else {
-        // TODO: test p us a directory
-        // if it is a directory return all files/subdirectories
-        // as <li><a href="/path/to/file">file name</a></li>
-        // <html><body><ul>...</ul></body></html>
         (
             StatusCode::NOT_FOUND,
             format!("File {} not found", p.display()),

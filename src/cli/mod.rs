@@ -1,6 +1,7 @@
 mod base64_opts;
 mod csv_opts;
 mod genpass_opts;
+mod gwt_opts;
 mod http;
 mod text_opts;
 
@@ -11,6 +12,7 @@ use std::path::{Path, PathBuf};
 pub use base64_opts::*;
 pub use csv_opts::*;
 pub use genpass_opts::*;
+pub use gwt_opts::*;
 pub use http::*;
 pub use text_opts::*;
 
@@ -38,6 +40,8 @@ pub enum SubCommand {
     Text(TextSubCommand),
     #[command(subcommand, about = "HTTP server")]
     Http(HttpSubCommand),
+    #[command(subcommand, about = "GWT server")]
+    GWT(GWTSubCommand),
 }
 
 #[enum_dispatch]
